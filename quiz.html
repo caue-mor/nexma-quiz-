@@ -626,6 +626,61 @@
       margin: 28px 0;
     }
 
+    /* ══ WELCOME MODE — primeira dobra fundo branco ══ */
+    body.welcome-mode {
+      background: #ffffff;
+    }
+
+    body.welcome-mode::before,
+    body.welcome-mode::after {
+      display: none;
+    }
+
+    body.welcome-mode .header {
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(28,27,58,0.07);
+    }
+
+    body.welcome-mode .footer {
+      background: rgba(255,255,255,0.96);
+      border-top-color: rgba(28,27,58,0.07);
+    }
+
+    body.welcome-mode .footer-txt {
+      color: rgba(28,27,58,0.3);
+    }
+
+    body.welcome-mode #screen-0 .welcome-title {
+      color: var(--navy);
+    }
+
+    body.welcome-mode #screen-0 .welcome-title em {
+      color: var(--red);
+    }
+
+    body.welcome-mode #screen-0 .welcome-sub {
+      color: rgba(28,27,58,0.58);
+    }
+
+    body.welcome-mode #screen-0 .meta-item {
+      color: rgba(28,27,58,0.55);
+    }
+
+    body.welcome-mode #screen-0 .pill-tag {
+      background: rgba(229,64,28,0.07);
+      border-color: rgba(229,64,28,0.22);
+      color: var(--red);
+    }
+
+    body.welcome-mode #screen-0 .hero-divider {
+      background: var(--red);
+    }
+
+    body.welcome-mode #screen-0 .logo-circle-wrap {
+      box-shadow: 0 0 0 10px rgba(28,27,58,0.05), 0 20px 48px rgba(28,27,58,0.1);
+    }
+
     /* ── MQL redirect bar ── */
     .mql-bar {
       display: none;
@@ -1143,9 +1198,10 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const el = document.getElementById(id);
     if (!el) return;
-    // Remove and re-add active to re-trigger animation
     void el.offsetWidth;
     el.classList.add('active');
+    // Fundo branco só na primeira dobra
+    document.body.classList.toggle('welcome-mode', id === 'screen-0');
   }
 
   function updateUI() {
@@ -1375,6 +1431,7 @@
   });
 
   /* ── Init ── */
+  document.body.classList.add('welcome-mode');
   show('screen-0');
   updateUI();
 </script>
