@@ -1246,9 +1246,13 @@
   let cur = 0;
   const TOTAL = 7;
 
+  // Guards anti-duplicação de eventos
+  let formSubmitted = false;  // impede duplo submit
+  let mqlFired      = false;  // impede duplo Lead MQL
+
   const ans = {
     nome: '', phone: '', insta: '',
-    prop: null,   // 'sim' | 'nao' | 'outro'
+    prop: null,
     proj: 0,
     mkt:  null,
     des:  null
@@ -1390,6 +1394,10 @@
 
   /* ── Submit ── */
   async function submit() {
+    // ── Guard anti-duplicação: ignora qualquer chamada após a primeira ──
+    if (formSubmitted) return;
+    formSubmitted = true;
+
     clearErrors();
     if (!ans.des) { err('err-des'); return; }
 
@@ -1442,8 +1450,11 @@
         fill.style.width = '0%';
         show('screen-ty2');
 
-        // ── Evento Lead MQL — dispara só para qualificados ──
-        fireMetaEvent('Lead MQL', userData);
+        // ── Guard: garante que Lead MQL dispara uma única vez ──
+        if (!mqlFired) {
+          mqlFired = true;
+          fireMetaEvent('Lead MQL', userData);
+        }
       }, DELAY_MS);
     }
 
@@ -1497,6 +1508,9 @@
   document.body.classList.add('welcome-mode');
   show('screen-0');
   updateUI();
+
+  // ── ViewContent: dispara uma vez quando o formulário é aberto ──
+  fireMetaEvent('ViewContent', {});
 </script>
 </body>
 </html>
