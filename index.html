@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diagnóstico Comercial | Nexma Grupo</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '841206889002972');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=841206889002972&ev=PageView&noscript=1"/>
+  </noscript>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1169,6 +1184,52 @@
   </footer>
 
 <script>
+  /* ── Meta Pixel + CAPI ── */
+  const META_PIXEL_ID  = '841206889002972';
+  const META_API_TOKEN = 'EAAPOelhb5r0BRYclN0JVoGZCpgbmBvOndIiGcbb3WwjTktbCRYN512SUcAdFkHL1CL07iywymDgSZCNSsKW9p2xs6e6V8vgSbYyZATxv5sr0kX4uT8wcnJ5wZBZAC8zGTozARgA4oLmW79IwkrKxPcwcBNKg9CfZCmCIu6TG9zOkgL0etBnyvr0b929dWzdrcEyQZDZD';
+
+  async function sha256(str) {
+    const clean = str.trim().toLowerCase().replace(/\D/g, '') || str.trim().toLowerCase();
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(clean));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function fireMetaEvent(eventName, userData = {}) {
+    const eventId  = 'nxm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+    const eventTime = Math.floor(Date.now() / 1000);
+
+    // 1. Browser pixel (deduplicado via eventID)
+    if (typeof fbq !== 'undefined') {
+      if (['Lead','Purchase','CompleteRegistration','ViewContent'].includes(eventName)) {
+        fbq('track', eventName, {}, { eventID: eventId });
+      } else {
+        fbq('trackCustom', eventName, {}, { eventID: eventId });
+      }
+    }
+
+    // 2. Conversions API (server-side deduplication)
+    const payload = {
+      data: [{
+        event_name:       eventName,
+        event_time:       eventTime,
+        event_id:         eventId,
+        action_source:    'website',
+        event_source_url: window.location.href,
+        user_data: {
+          client_user_agent: navigator.userAgent,
+          ...userData
+        }
+      }],
+      access_token: META_API_TOKEN
+    };
+
+    fetch('https://graph.facebook.com/v19.0/' + META_PIXEL_ID + '/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
   /* ── UTM capture (roda ao carregar a página) ── */
   const utms = (() => {
     const p = new URLSearchParams(window.location.search);
@@ -1328,7 +1389,7 @@
   }
 
   /* ── Submit ── */
-  function submit() {
+  async function submit() {
     clearErrors();
     if (!ans.des) { err('err-des'); return; }
 
@@ -1336,7 +1397,7 @@
     ans.nome  = document.getElementById('field-nome').value.trim();
     ans.proj  = parseInt(document.getElementById('numDisplay').textContent) || 0;
 
-    const firstName = ans.nome.split(' ')[0];
+    const firstName  = ans.nome.split(' ')[0];
     const isQualified = ans.prop === 'sim' && ans.proj >= 4;
 
     document.getElementById('name1').textContent = firstName;
@@ -1349,13 +1410,18 @@
     document.getElementById('btnCta2').onclick = () =>
       window.open('https://wa.me/55?text=' + waMsg, '_blank');
 
+    // Prepara user_data com hash do telefone
+    const phoneDigits = ans.phone.replace(/\D/g, '');
+    const hashedPhone = phoneDigits.length >= 10 ? await sha256(phoneDigits) : undefined;
+    const userData = hashedPhone ? { ph: [hashedPhone] } : {};
+
     // ── Todos caem na TY1 primeiro ──
     cur = TOTAL + 1;
     show('screen-ty1');
     updateUI();
 
-    // ── Pixel TY1: dispare aqui o evento de conversão da TY1 ──
-    // fbq('track', 'Lead');  ← exemplo Meta Pixel
+    // ── Evento LEAD — dispara para todos ──
+    fireMetaEvent('Lead', userData);
 
     // ── MQL: redireciona automaticamente para TY2 após 2.5s ──
     if (isQualified) {
@@ -1363,24 +1429,21 @@
       const bar  = document.getElementById('mqlBar');
       const fill = document.getElementById('mqlFill');
 
-      // Mostra barra de progresso
       bar.classList.add('show');
 
-      // Anima o fill em sync com o delay
       requestAnimationFrame(() => {
         fill.style.transition = 'width ' + DELAY_MS + 'ms linear';
         fill.style.width = '100%';
       });
 
-      // Redirect garantido — não pode ser cancelado pelo usuário
       setTimeout(() => {
         bar.classList.remove('show');
         fill.style.transition = 'none';
         fill.style.width = '0%';
         show('screen-ty2');
 
-        // ── Pixel TY2: dispare aqui o evento de conversão da TY2 ──
-        // fbq('track', 'CompleteRegistration');  ← exemplo Meta Pixel
+        // ── Evento Lead MQL — dispara só para qualificados ──
+        fireMetaEvent('Lead MQL', userData);
       }, DELAY_MS);
     }
 
