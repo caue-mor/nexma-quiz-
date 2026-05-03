@@ -1378,8 +1378,50 @@
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
+  /* ── Helpers para enrichment de user_data ── */
+  function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return m ? decodeURIComponent(m[2]) : null;
+  }
+
+  function getFbc() {
+    const cookie = getCookie('_fbc');
+    if (cookie) return cookie;
+    const fbclid = new URLSearchParams(window.location.search).get('fbclid');
+    if (fbclid) return 'fb.1.' + Date.now() + '.' + fbclid;
+    return null;
+  }
+
+  function getFbp() { return getCookie('_fbp'); }
+
+  function getExternalId() {
+    let id = localStorage.getItem('nxm_eid');
+    if (!id) {
+      id = 'nxm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+      localStorage.setItem('nxm_eid', id);
+    }
+    return id;
+  }
+
+  // IP captado no carregamento — melhor esforço
+  let _clientIp = null;
+  fetch('https://api.ipify.org?format=json')
+    .then(r => r.json())
+    .then(d => { _clientIp = d.ip; })
+    .catch(() => {});
+
+  async function buildBaseUserData() {
+    const base = { client_user_agent: navigator.userAgent };
+    const fbc = getFbc(); if (fbc) base.fbc = fbc;
+    const fbp = getFbp(); if (fbp) base.fbp = fbp;
+    if (_clientIp) base.client_ip_address = _clientIp;
+    const eid = getExternalId();
+    if (eid) base.external_id = [await sha256(eid)];
+    return base;
+  }
+
   async function fireMetaEvent(eventName, userData = {}) {
-    const eventId  = 'nxm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+    const eventId   = 'nxm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
     const eventTime = Math.floor(Date.now() / 1000);
 
     // 1. Browser pixel (deduplicado via eventID)
@@ -1391,7 +1433,8 @@
       }
     }
 
-    // 2. Conversions API (server-side deduplication)
+    // 2. Conversions API — enriquecido com fbc, fbp, IP e external_id
+    const baseUserData = await buildBaseUserData();
     const payload = {
       data: [{
         event_name:       eventName,
@@ -1399,10 +1442,7 @@
         event_id:         eventId,
         action_source:    'website',
         event_source_url: window.location.href,
-        user_data: {
-          client_user_agent: navigator.userAgent,
-          ...userData
-        }
+        user_data: { ...baseUserData, ...userData }
       }],
       access_token: META_API_TOKEN
     };
