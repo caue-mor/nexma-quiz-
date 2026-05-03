@@ -374,6 +374,45 @@
 
     .field::placeholder { color: rgba(255,255,255,0.22); font-weight: 400; }
 
+    /* ── Phone field with prefix ── */
+    .phone-wrap {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background: var(--faint);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s, background 0.2s;
+      overflow: hidden;
+    }
+    .phone-wrap:focus-within {
+      border-color: var(--red);
+      background: rgba(229,64,28,0.06);
+    }
+    .phone-prefix {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 17px 14px 17px 18px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      white-space: nowrap;
+      border-right: 1.5px solid var(--border);
+      user-select: none;
+    }
+    .phone-prefix .flag { font-size: 20px; line-height: 1; }
+    .phone-wrap .field {
+      border: none;
+      border-radius: 0;
+      margin-bottom: 0;
+      background: transparent;
+      padding-left: 16px;
+      flex: 1;
+    }
+    .phone-wrap .field:focus { background: transparent; border-color: transparent; }
+
     .field:focus {
       border-color: var(--red);
       background: rgba(229,64,28,0.06);
@@ -696,6 +735,115 @@
       box-shadow: 0 0 0 10px rgba(28,27,58,0.05), 0 20px 48px rgba(28,27,58,0.1);
     }
 
+    /* ── Helix screen ── */
+    body.helix-mode {
+      background: #ffffff;
+    }
+    body.helix-mode::before,
+    body.helix-mode::after { display: none; }
+    body.helix-mode .header {
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid rgba(28,27,58,0.07);
+    }
+    body.helix-mode .footer {
+      background: rgba(255,255,255,0.96);
+      border-top-color: rgba(28,27,58,0.07);
+    }
+    body.helix-mode .footer-txt { color: rgba(28,27,58,0.3); }
+
+    .helix-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      padding: 0 8px;
+    }
+    .helix-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 20px;
+      object-fit: contain;
+    }
+    .helix-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(229,64,28,0.08);
+      border: 1px solid rgba(229,64,28,0.22);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .helix-title {
+      font-size: clamp(28px, 6vw, 42px);
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .helix-title span { color: var(--red); }
+    .helix-sub {
+      font-size: 15px;
+      color: rgba(28,27,58,0.58);
+      line-height: 1.6;
+      margin-bottom: 28px;
+      max-width: 440px;
+    }
+    .helix-list {
+      list-style: none;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .helix-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(28,27,58,0.04);
+      border: 1px solid rgba(28,27,58,0.07);
+      border-radius: 12px;
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 14px;
+      color: rgba(28,27,58,0.75);
+      line-height: 1.4;
+    }
+    .helix-list li strong { color: var(--navy); font-weight: 700; }
+    .helix-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+    }
+    .btn-helix-continue {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 36px;
+      border-radius: 12px;
+      background: var(--red);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-helix-continue:hover {
+      background: var(--red-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(229,64,28,0.35);
+    }
+
     /* ── MQL redirect bar ── */
     .mql-bar {
       display: none;
@@ -792,18 +940,18 @@
       <img src="nexma logo.png" alt="Nexma Grupo" class="welcome-logo">
 
       <div class="pill-tag">
-        Diagnóstico Comercial Gratuito
+        Atraímos, qualificamos e convertemos.
       </div>
 
       <h1 class="welcome-title">
-        Sua empresa de energia Solar precisa da maior assessoria de marketing Solar
-        <em class="block-caps">DA AMÉRICA LATINA.</em>
+        Saiba o que a maior <em>assessoria solar</em> de marketing e tecnologia faz para alavancar mais de
+        <em class="block-caps">+240 integradores a nível Brasil.</em>
       </h1>
 
       <div class="hero-divider"></div>
 
       <p class="welcome-sub">
-        Responda 7 perguntas rápidas. Vamos identificar o momento comercial da sua empresa e mostrar se faz sentido usar captação de clientes com orquestradores de IA.
+        Responda algumas perguntas rápidas para entender como fazemos empresários de mais de 24 estados do Brasil a construírem uma máquina de adquirir e vender solar.
       </p>
 
       <div class="welcome-meta">
@@ -828,7 +976,7 @@
       </div>
 
       <button class="btn-primary" onclick="startQuiz()" style="margin: 0 auto;">
-        Começar diagnóstico
+        Quero entender
         <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
         </svg>
@@ -865,8 +1013,14 @@
       <h2 class="q-title">Qual é o seu <em>WhatsApp</em>?</h2>
       <p class="q-desc">Com DDD. Usaremos apenas para enviar o seu resultado.</p>
 
-      <input type="tel" class="field" id="field-phone" placeholder="+55 (85) 99999-9999"
-             autocomplete="tel" onkeydown="handleEnter(event)">
+      <div class="phone-wrap">
+        <div class="phone-prefix">
+          <span class="flag">🇧🇷</span>
+          +55
+        </div>
+        <input type="tel" class="field" id="field-phone" placeholder="(11) 99999-9999"
+               autocomplete="tel" onkeydown="handleEnter(event)">
+      </div>
       <p class="field-error" id="err-phone">
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Insira um número válido com DDD.
@@ -1035,8 +1189,46 @@
           </svg>
           Voltar
         </button>
-        <button class="btn-primary" onclick="nextQ()">
+        <button class="btn-primary" onclick="showHelix()">
           Continuar
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ TELA HELIX: Consciência ══ -->
+    <div class="screen" id="screen-helix">
+      <div class="helix-card">
+        <img src="helix logo.png" alt="Helix IA" class="helix-logo">
+        <div class="helix-badge">A 1ª e única IA do mercado solar</div>
+        <h2 class="helix-title">Conheça a <span>Helix</span></h2>
+        <p class="helix-sub">A startup do Grupo Nexma que já está transformando a operação comercial de integradores em todo o Brasil.</p>
+        <ul class="helix-list">
+          <li>
+            <span class="helix-icon">⚡</span>
+            <span>Prospecta e atende leads <strong>em tempo real</strong></span>
+          </li>
+          <li>
+            <span class="helix-icon">🗂️</span>
+            <span>Salva todos os dados de clientes <strong>categorizados automaticamente</strong></span>
+          </li>
+          <li>
+            <span class="helix-icon">📄</span>
+            <span>Gera a <strong>proposta comercial automaticamente</strong></span>
+          </li>
+          <li>
+            <span class="helix-icon">📞</span>
+            <span>Permite <strong>ligação e gestão comercial</strong> de um único lugar</span>
+          </li>
+          <li>
+            <span class="helix-icon">✅</span>
+            <span>Deixa todas as <strong>atividades do time prontas</strong> sem esforço manual</span>
+          </li>
+        </ul>
+        <button class="btn-helix-continue" onclick="helixContinue()">
+          Última pergunta
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
           </svg>
@@ -1079,7 +1271,7 @@
       </p>
 
       <div class="nav-row">
-        <button class="btn-back" onclick="prevQ()">
+        <button class="btn-back" onclick="helixBack()">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
           </svg>
@@ -1263,6 +1455,7 @@
     el.classList.add('active');
     // Fundo branco só na primeira dobra
     document.body.classList.toggle('welcome-mode', id === 'screen-0');
+    document.body.classList.toggle('helix-mode', id === 'screen-helix');
   }
 
   function updateUI() {
@@ -1314,6 +1507,25 @@
     updateUI();
   }
 
+  function showHelix() {
+    if (!validate()) return;
+    saveField();
+    show('screen-helix');
+    updateUI();
+  }
+
+  function helixContinue() {
+    cur = 7;
+    show('screen-7');
+    updateUI();
+  }
+
+  function helixBack() {
+    cur = 6;
+    show('screen-6');
+    updateUI();
+  }
+
   /* ── Validation ── */
   function validate() {
     clearErrors();
@@ -1352,7 +1564,10 @@
   /* ── Save fields ── */
   function saveField() {
     if (cur === 1) ans.nome  = document.getElementById('field-nome').value.trim();
-    if (cur === 2) ans.phone = document.getElementById('field-phone').value.trim();
+    if (cur === 2) {
+      const raw = document.getElementById('field-phone').value.trim();
+      ans.phone = raw ? '+55' + raw.replace(/\D/g,'') : '';
+    }
     if (cur === 3) ans.insta = document.getElementById('field-insta').value.trim();
     if (cur === 5) ans.proj  = parseInt(document.getElementById('numDisplay').textContent) || 0;
   }
